@@ -1,5 +1,4 @@
 #include <iostream>
-#include <sstream>
 
 #include "../../Common/constants.h"
 #include "../include/NRRDReader.h"
@@ -7,9 +6,11 @@
 namespace RC = ReaderConst;
 
 
+//------------------------------------------------------------------------
 /* Internal use: checks file format from image header to ensure
 	it is valid
 	- throws runtime error if not */
+
 void NRRDReader::checkFileFormat(const std::string& prefix,
 								 const int start,
 								 const int length) const
@@ -28,6 +29,8 @@ void NRRDReader::checkFileFormat(const std::string& prefix,
 	}
 }
 
+
+//------------------------------------------------------------------------
 
 int NRRDReader::readLine(const std::string& inBuffer,
 						 std::string& key,
@@ -90,6 +93,8 @@ int NRRDReader::readLine(const std::string& inBuffer,
 }
 
 
+//------------------------------------------------------------------------
+
 void NRRDReader::readHeader()
 {
 	char prefixBuffer[RC::MAX_BUFFER_SIZE];
@@ -117,14 +122,14 @@ void NRRDReader::readHeader()
 		{
 			m_headerSize = file.tellg();
 			file.seekg(0, file.end);
-			m_imageSize = static_cast<int>(file.tellg()) - m_headerSize;
+			m_zipImageSize = static_cast<int>(file.tellg()) - m_headerSize;
 
-			if (m_headerSize == 0 || m_imageSize == 0)
+			if (m_headerSize == 0 || m_zipImageSize == 0)
 			{
 				throw std::runtime_error("Invalid header ("
 					+ std::to_string(m_headerSize)
 					+ ") or image size ("
-					+ std::to_string(m_imageSize) + "0");
+					+ std::to_string(m_zipImageSize) + "0");
 			}
 
 			break;
@@ -148,16 +153,55 @@ void NRRDReader::readHeader()
 }
 
 
+//------------------------------------------------------------------------
+
+void NRRDReader::parseHeader()
+{
+
+	for (auto const& [key, val] : m_imgHeader)
+	{
+		if (key == "sizes")
+		{
+			
+		}
+	}
+}
+
+
+//------------------------------------------------------------------------
+
 void NRRDReader::readImage()
 {
-	std::vector<int> buffer(m_imageSize);
+	char* inBuffer = new char[m_zipImageSize]; // TODO CHECK HEADER, ALLOW OTHER ALGS
 	std::ifstream file(m_filePath, std::ios::in | std::ios::binary);
 	file.seekg(m_headerSize, std::ios::beg);
-	//file.read(buffer.data());
+	file.read(inBuffer, m_zipImageSize);
 
-	//for (int i{ 0 }; i < 512; ++i)
-	//{
-	//	std::cout << buffer[i] << " ";
-	//}
-	//std::cout << std::endl;
+	char* outBuffer = decompressGzip(inBuffer);
+	short t{ 0 };
+	int i{ 0 };
+	m_Image = std::make_unique<NRRDImage>(512, 512, 145);
+	int numPixels{ 0 };
+
+	while (i < m_unzipImageSize)
+	{
+		numPixels = m_Image->setPixel((short)outBuffer[i] | (short)outBuffer[i + 1] << 8);
+
+		if (numPixels > 0)
+		{
+			break;
+		}
+
+		i += 2;
+	}
+
+	if (numPixels != m_unzipImageSize / 2)
+	{
+		throw std::runtime_error("Incomplete image reading: "
+			+ std::to_string(numPixels)
+			+ " vs "
+			+ std::to_string(m_unzipImageSize / 2));
+	}
+
+	delete[] outBuffer;
 }

@@ -24,7 +24,7 @@ public:
 	void getImage() {};
 
 	/* Header getter */
-	ImgHeader getHeader() const { return m_imgHeader; }
+	GenericImgHeader getHeader() const { return m_imgHeader; }
 
 	/* File path setter */
 	template<typename T>
@@ -44,14 +44,18 @@ protected:
 
 	/* Header and image reading methods */
 	virtual void readHeader() = 0;
+	virtual void parseHeader() = 0;
 	virtual void readImage() = 0;
+
+	/* Compression methods */
+	char* decompressGzip(const char*);
 
 	/* Attributes */
 	fs::path m_filePath;
-	long m_headerSize{ 0 };
-	long m_imageSize{ 0 };
-	ImgHeader m_imgHeader = ImgHeader();
-	
+	unsigned long m_headerSize{ 0 };
+	unsigned long m_zipImageSize{ 0 };
+	unsigned long m_unzipImageSize{ 0 };
+	GenericImgHeader m_imgHeader = GenericImgHeader();
 };
 
 #endif // BASEREADER_H

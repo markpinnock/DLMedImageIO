@@ -1,23 +1,29 @@
+//#define _CRTDBG_MAP_ALLOC
+//#include <stdlib.h>
+//#include <crtdbg.h>
+
 #include <filesystem>
 #include <iostream>
-#include <sstream>
+
 #include <string>
 
-#include "Common/types.h" // REMOVE
+#include "Image/include/BaseImage.h"
 #include "IO/include/NRRDReader.h"
 
 namespace fs = std::filesystem;
 
 
-void printHdr(const ImgHeader&);
+void printHdr(const GenericImgHeader&);
 
 int main()
 {
+	//NRRDReader reader = NRRDReader(".\\test.nrrd");
 	NRRDReader reader = NRRDReader("D:\\ProjectImages\\Images\\T005A0\\T005A0AC005.nrrd");
 
 	try
 	{
 		reader.read();
+		//reader.testGzip();
 	}
 	catch (std::exception& e)
 	{
@@ -27,11 +33,12 @@ int main()
 
 	auto hdr = reader.getHeader();
 	printHdr(hdr);
+	_CrtDumpMemoryLeaks();
 
 	return EXIT_SUCCESS;
 }
 
-void printHdr(const ImgHeader& hdr)
+void printHdr(const GenericImgHeader& hdr)
 {
 	for (auto& el : hdr)
 	{

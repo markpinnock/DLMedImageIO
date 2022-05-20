@@ -1,11 +1,7 @@
-# IO module CMake file
+# Image module CMake file
 
 # Add source code to IO library and link with zlib
-add_library (IO STATIC "src/BaseReader.cpp" "src/NRRDReader.cpp")
-target_link_libraries (IO PUBLIC zlib)
-
-# Include location of zlib binary
-target_include_directories (IO PUBLIC "${PROJECT_BINARY_DIR}/External/zlib")
+add_library (image STATIC "src/BaseImage.cpp" "src/NRRDImage.cpp")
 
 # Add libraries
 #find_library (TF NAMES tensorflow_cc PATHS "${TF_LIB_DIR}/src")
@@ -20,16 +16,16 @@ if (BUILD_TESTING)
 	enable_testing ()
 
 	# Add executable for unit tests
-	add_executable (IO-tests "test/test_IO.cpp")
+	add_executable (image-tests "test/test_Image.cpp")
 
 	# Link library
 	if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-		target_link_libraries (IO-tests PUBLIC IO ${GTEST} ${GTEST_MAIN})
+		target_link_libraries (image-tests PUBLIC image ${GTEST} ${GTEST_MAIN})
 	else()
-		target_link_libraries (IO-tests PUBLIC IO GTest::gtest GTest::gtest_main)
+		target_link_libraries (image-tests PUBLIC image GTest::gtest GTest::gtest_main)
 	endif()
 
 	# Add GoogleTest so that Visual Studio can add tests to Test Explorer
-	gtest_discover_tests (IO-tests)
+	gtest_discover_tests (image-tests)
 
 endif()

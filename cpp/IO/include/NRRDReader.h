@@ -4,6 +4,7 @@
 #include <fstream>
 
 #include "BaseReader.h"
+#include "../../Image/include/NRRDImage.h"
 
 
 /* NRRD Reader */
@@ -13,7 +14,7 @@ public:
 	NRRDReader(const std::string& filePath) : BaseReader{ filePath } {}; // TODO: Can I replace these with template
 	NRRDReader(const fs::path& filePath) : BaseReader{ filePath } {};
 	NRRDReader(const char* filePath) : BaseReader{ filePath } {};
-
+	void testGzip();
 private:
 	/* Path and file format checking methods */
 	void checkFileFormat(const std::string&,
@@ -25,7 +26,10 @@ private:
 
 	/* Header and image reading methods */
 	void readHeader() override;
+	void parseHeader() override;
 	void readImage() override;
+
+	std::unique_ptr<NRRDImage> m_Image;
 };
 
 #endif // NRRDREADER_H
