@@ -1,9 +1,9 @@
-#include "../include/BaseImage.h"
+#include "../include/Image.h"
 
 
 //------------------------------------------------------------------------
 
-int BaseImage::setPixel(const int value)
+int Image::setPixel(const int value)
 {
 	m_imageMatrix[m_count] = value;
 	m_count += 1;

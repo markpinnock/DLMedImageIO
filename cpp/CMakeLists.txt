@@ -43,12 +43,13 @@ endif()
 # Include modules
 add_subdirectory ("Image")
 add_subdirectory ("IO")
+add_subdirectory ("Zip")
 
 # Include third party libraries
 add_subdirectory ("External")
 
-add_executable (io-main main.cpp "Common/types.h" "Common/constants.h" "Image/src/BaseImage.cpp" "Image/include/ImageHeader.h")
-target_link_libraries (io-main PUBLIC IO)
+add_executable (io-main "main.cpp" "Common/types.h" "Common/constants.h")
+target_link_libraries (io-main PUBLIC IO image zip)
 #target_link_libraries (io-main PUBLIC EXTERNAL_LIBS)
 target_include_directories (io-main PUBLIC ${PROJECT_BINARY_DIR} ${EXTRA_INCLUDES})
 

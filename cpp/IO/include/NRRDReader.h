@@ -4,7 +4,7 @@
 #include <fstream>
 
 #include "BaseReader.h"
-#include "../../Image/include/NRRDImage.h"
+#include "../../Image/include/Image.h"
 
 
 /* NRRD Reader */
@@ -28,8 +28,6 @@ private:
 	void readHeader() override;
 	void parseHeader() override;
 	void readImage() override;
-
-	std::unique_ptr<NRRDImage> m_Image;
 };
 
 #endif // NRRDREADER_H

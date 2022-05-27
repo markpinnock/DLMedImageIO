@@ -6,6 +6,9 @@
 #include <string>
 
 #include "../../Common/types.h"
+#include "../../Image/include/Image.h"
+#include "../../Image/include/ImageHeader.h"
+#include "../../Zip/include/IZip.h"
 
 namespace fs = std::filesystem;
 
@@ -24,7 +27,8 @@ public:
 	void getImage() {};
 
 	/* Header getter */
-	GenericImgHeader getHeader() const { return m_imgHeader; }
+	ImgHeaderMap getHeader() const { return m_imgHeader->imgHeaderMap; }
+	void printHeader() const { m_imgHeader->printHeader(); }
 
 	/* File path setter */
 	template<typename T>
@@ -47,15 +51,15 @@ protected:
 	virtual void parseHeader() = 0;
 	virtual void readImage() = 0;
 
-	/* Compression methods */
-	char* decompressGzip(const char*);
-
 	/* Attributes */
 	fs::path m_filePath;
 	unsigned long m_headerSize{ 0 };
 	unsigned long m_zipImageSize{ 0 };
 	unsigned long m_unzipImageSize{ 0 };
-	GenericImgHeader m_imgHeader = GenericImgHeader();
+
+	std::unique_ptr<IZip> m_Zip;
+	std::unique_ptr<ImageHeader> m_imgHeader;
+	std::unique_ptr<Image> m_Image;
 };
 
-#endif // BASEREADER_H
+#endif // !BASEREADER_H

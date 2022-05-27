@@ -7,13 +7,11 @@
 
 #include <string>
 
-#include "Image/include/BaseImage.h"
+#include "Image/include/Image.h"
 #include "IO/include/NRRDReader.h"
 
 namespace fs = std::filesystem;
 
-
-void printHdr(const GenericImgHeader&);
 
 int main()
 {
@@ -31,17 +29,9 @@ int main()
 		return EXIT_FAILURE;
 	}
 
-	auto hdr = reader.getHeader();
-	printHdr(hdr);
+	reader.printHeader();
+
 	_CrtDumpMemoryLeaks();
 
 	return EXIT_SUCCESS;
-}
-
-void printHdr(const GenericImgHeader& hdr)
-{
-	for (auto& el : hdr)
-	{
-		std::cout << el.first << " " << el.second << std::endl;
-	}
 }

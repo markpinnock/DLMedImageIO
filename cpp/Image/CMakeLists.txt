@@ -1,7 +1,7 @@
 # Image module CMake file
 
-# Add source code to IO library and link with zlib
-add_library (image STATIC "src/BaseImage.cpp" "src/NRRDImage.cpp")
+# Add source code to image library
+add_library (image STATIC "src/Image.cpp")
 
 # Add libraries
 #find_library (TF NAMES tensorflow_cc PATHS "${TF_LIB_DIR}/src")

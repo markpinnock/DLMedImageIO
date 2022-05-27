@@ -1,7 +1,10 @@
 #include <iostream>
 
 #include "../../Common/constants.h"
+#include "../../Image/include/ImageHeader.h"
+#include "../../Zip/include/GZip.h"
 #include "../include/NRRDReader.h"
+#include "../include/utils.h"
 
 namespace RC = ReaderConst;
 
@@ -97,6 +100,8 @@ int NRRDReader::readLine(const std::string& inBuffer,
 
 void NRRDReader::readHeader()
 {
+	m_imgHeader = std::make_unique<ImageHeader>();
+
 	char prefixBuffer[RC::MAX_BUFFER_SIZE];
 	std::string buffer;
 	std::ifstream file(m_filePath, std::ios::in | std::ios::binary);
@@ -144,7 +149,7 @@ void NRRDReader::readHeader()
 			}
 			else
 			{
-				m_imgHeader.insert({ k, v });
+				m_imgHeader->imgHeaderMap.insert({ k, v });
 				k.clear();
 				v.clear();
 			}
@@ -158,11 +163,68 @@ void NRRDReader::readHeader()
 void NRRDReader::parseHeader()
 {
 
-	for (auto const& [key, val] : m_imgHeader)
+	for (auto const& [key, val] : m_imgHeader->imgHeaderMap)
 	{
-		if (key == "sizes")
+		if (key == "type")
 		{
-			
+			m_imgHeader->type = val;
+		}
+		else if (key == "sizes")
+		{
+			std::vector<std::string> output;
+			utils::splitString(" ", val, output);
+
+			for (auto& el : output)
+			{
+				m_imgHeader->sizes.push_back(std::stoi(el));
+			}
+		}
+		else if (key == "dimension")
+		{
+			m_imgHeader->dimension = std::stoi(val);
+		}
+		else if (key == "space")
+		{
+			m_imgHeader->space = val;
+		}
+		else if (key == "space directions")
+		{
+			std::vector<std::string> outer;
+			std::vector<std::string> inner;
+			utils::splitString(" ", val, outer);
+
+			for (auto& elOuter : outer)
+			{
+				inner.clear();
+				utils::splitString(",", elOuter, inner);
+
+				for (auto& elInner : inner)
+				{
+					m_imgHeader->space_directions.push_back(std::stof(elInner));
+				}
+			}
+		}
+		else if (key == "kinds")
+		{
+			m_imgHeader->kinds = val;
+		}
+		else if (key == "endian")
+		{
+			m_imgHeader->endian = val;
+		}
+		else if (key == "encoding")
+		{
+			m_imgHeader->encoding= val;
+		}
+		else if (key == "space origin")
+		{
+			std::vector<std::string> output;
+			utils::splitString(",", val, output);
+
+			for (auto& el : output)
+			{
+				m_imgHeader->space_origin.push_back(std::stof(el));
+			}
 		}
 	}
 }
@@ -172,20 +234,48 @@ void NRRDReader::parseHeader()
 
 void NRRDReader::readImage()
 {
+	if (m_imgHeader->encoding == "gzip")
+	{
+		m_Zip = std::make_unique<GZip>();
+	}
+
 	char* inBuffer = new char[m_zipImageSize]; // TODO CHECK HEADER, ALLOW OTHER ALGS
 	std::ifstream file(m_filePath, std::ios::in | std::ios::binary);
 	file.seekg(m_headerSize, std::ios::beg);
 	file.read(inBuffer, m_zipImageSize);
 
-	char* outBuffer = decompressGzip(inBuffer);
+	for (int i{ 0 }; i < 4; ++i) // TODO ALLOW OTHER ENDIANS
+	{
+		m_unzipImageSize |= (unsigned char)inBuffer[m_zipImageSize - 4 + i] << 8 * i;
+	}
+
+	char* outBuffer = m_Zip->decompress(inBuffer, m_zipImageSize, m_unzipImageSize);
 	short t{ 0 };
 	int i{ 0 };
-	m_Image = std::make_unique<NRRDImage>(512, 512, 145);
+
+	if (m_imgHeader->dimension == 2)
+	{
+		m_Image = std::make_unique<Image>(m_imgHeader->sizes[0],
+										  m_imgHeader->sizes[1]);
+	}
+
+	else if (m_imgHeader->dimension == 3)
+	{
+		m_Image = std::make_unique<Image>(m_imgHeader->sizes[0],
+										  m_imgHeader->sizes[1],
+										  m_imgHeader->sizes[2]);
+	}
+
+	else
+	{
+		throw std::runtime_error("Invalid dimensions: " + m_imgHeader->dimension);
+	}
+	
 	int numPixels{ 0 };
 
 	while (i < m_unzipImageSize)
 	{
-		numPixels = m_Image->setPixel((short)outBuffer[i] | (short)outBuffer[i + 1] << 8);
+		numPixels = m_Image->setPixel((short)outBuffer[i] | (short)outBuffer[i + 1] << 8); // TODO: ALLOW OTHER TYPES
 
 		if (numPixels > 0)
 		{
@@ -204,4 +294,6 @@ void NRRDReader::readImage()
 	}
 
 	delete[] outBuffer;
+
+	// TODO: transfer imgHeader ownership
 }

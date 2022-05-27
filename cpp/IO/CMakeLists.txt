@@ -1,11 +1,7 @@
 # IO module CMake file
 
 # Add source code to IO library and link with zlib
-add_library (IO STATIC "src/BaseReader.cpp" "src/NRRDReader.cpp")
-target_link_libraries (IO PUBLIC zlib)
-
-# Include location of zlib binary
-target_include_directories (IO PUBLIC "${PROJECT_BINARY_DIR}/External/zlib")
+add_library (IO STATIC "src/BaseReader.cpp" "src/NRRDReader.cpp" "include/utils.h" "src/utils.cpp")
 
 # Add libraries
 #find_library (TF NAMES tensorflow_cc PATHS "${TF_LIB_DIR}/src")
@@ -20,7 +16,7 @@ if (BUILD_TESTING)
 	enable_testing ()
 
 	# Add executable for unit tests
-	add_executable (IO-tests "test/test_IO.cpp")
+	add_executable (IO-tests "test/test_IO.cpp" "include/utils.h" "src/utils.cpp")
 
 	# Link library
 	if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
