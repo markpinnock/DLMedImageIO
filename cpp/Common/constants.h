@@ -7,4 +7,13 @@ namespace ReaderConst
 	constexpr char NRRD_PREFIX[5]{ "NRRD" };
 }
 
+
+namespace NumBytes
+{
+	enum { CHAR = 1,
+		   SHORT = 2,
+		   INT = 4,
+		   LONG = 8 };
+}
+
 #endif // CONSTANTS_H

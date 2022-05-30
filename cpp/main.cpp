@@ -7,8 +7,10 @@
 
 #include <string>
 
+#include "Common/test_utils.h"
 #include "Image/include/Image.h"
 #include "IO/include/NRRDReader.h"
+#include "Zip/include/GZip.h"
 
 namespace fs = std::filesystem;
 
@@ -21,7 +23,6 @@ int main()
 	try
 	{
 		reader.read();
-		//reader.testGzip();
 	}
 	catch (std::exception& e)
 	{
@@ -29,8 +30,11 @@ int main()
 		return EXIT_FAILURE;
 	}
 
+	auto img = reader.getImage();
+	std::cout << (img == nullptr) << std::endl;
+	img->printHeader();
 	reader.printHeader();
-
+	std::cout << (reader.getImage() == nullptr) << std::endl;
 	_CrtDumpMemoryLeaks();
 
 	return EXIT_SUCCESS;

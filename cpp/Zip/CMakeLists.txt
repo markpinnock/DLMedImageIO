@@ -15,13 +15,13 @@ if (BUILD_TESTING)
 	enable_testing ()
 
 	# Add executable for unit tests
-	add_executable (zip-tests "test/test_zip.cpp")
+	add_executable (zip-tests "test/test_gzip.cpp" "../Common/test_utils.h" "../Common/test_utils.cpp")
 
 	# Link library
 	if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-		target_link_libraries (zip-tests PUBLIC IO ${GTEST} ${GTEST_MAIN})
+		target_link_libraries (zip-tests PUBLIC zip ${GTEST} ${GTEST_MAIN})
 	else()
-		target_link_libraries (zip-tests PUBLIC IO GTest::gtest GTest::gtest_main)
+		target_link_libraries (zip-tests PUBLIC zip GTest::gtest GTest::gtest_main)
 	endif()
 
 	# Add GoogleTest so that Visual Studio can add tests to Test Explorer

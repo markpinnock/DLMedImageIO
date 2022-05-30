@@ -4,9 +4,20 @@
 #include "../../Image/include/ImageHeader.h"
 #include "../../Zip/include/GZip.h"
 #include "../include/NRRDReader.h"
-#include "../include/utils.h"
+#include "../include/IO_utils.h"
 
 namespace RC = ReaderConst;
+
+
+//------------------------------------------------------------------------
+
+void NRRDReader::read()
+{
+	checkFilePath();
+	readHeader();
+	parseHeader();
+	readImage();
+}
 
 
 //------------------------------------------------------------------------
@@ -20,11 +31,6 @@ void NRRDReader::checkFileFormat(const std::string& prefix,
 {
 	if (strcmp(prefix.substr(start, length).c_str(), RC::NRRD_PREFIX))
 	{
-		std::cout << "Incorrect file format: "
-			+ m_filePath.string()
-			+ ", "
-			+ prefix
-			<< std::endl;
 		throw std::runtime_error("Incorrect file format: "
 			+ m_filePath.string()
 			+ ", "
@@ -100,7 +106,7 @@ int NRRDReader::readLine(const std::string& inBuffer,
 
 void NRRDReader::readHeader()
 {
-	m_imgHeader = std::make_unique<ImageHeader>();
+	m_imgHeader = std::make_shared<ImageHeader>();
 
 	char prefixBuffer[RC::MAX_BUFFER_SIZE];
 	std::string buffer;
@@ -134,7 +140,7 @@ void NRRDReader::readHeader()
 				throw std::runtime_error("Invalid header ("
 					+ std::to_string(m_headerSize)
 					+ ") or image size ("
-					+ std::to_string(m_zipImageSize) + "0");
+					+ std::to_string(m_zipImageSize) + ")");
 			}
 
 			break;
@@ -172,7 +178,7 @@ void NRRDReader::parseHeader()
 		else if (key == "sizes")
 		{
 			std::vector<std::string> output;
-			utils::splitString(" ", val, output);
+			IO_Utils::splitString(" ", val, output);
 
 			for (auto& el : output)
 			{
@@ -191,12 +197,12 @@ void NRRDReader::parseHeader()
 		{
 			std::vector<std::string> outer;
 			std::vector<std::string> inner;
-			utils::splitString(" ", val, outer);
+			IO_Utils::splitString(" ", val, outer);
 
 			for (auto& elOuter : outer)
 			{
 				inner.clear();
-				utils::splitString(",", elOuter, inner);
+				IO_Utils::splitString(",", elOuter, inner);
 
 				for (auto& elInner : inner)
 				{
@@ -219,7 +225,7 @@ void NRRDReader::parseHeader()
 		else if (key == "space origin")
 		{
 			std::vector<std::string> output;
-			utils::splitString(",", val, output);
+			IO_Utils::splitString(",", val, output);
 
 			for (auto& el : output)
 			{
@@ -244,14 +250,10 @@ void NRRDReader::readImage()
 	file.seekg(m_headerSize, std::ios::beg);
 	file.read(inBuffer, m_zipImageSize);
 
-	for (int i{ 0 }; i < 4; ++i) // TODO ALLOW OTHER ENDIANS
-	{
-		m_unzipImageSize |= (unsigned char)inBuffer[m_zipImageSize - 4 + i] << 8 * i;
-	}
+	m_unzipImageSize = IO_Utils::littleEndianGZipFileSize(inBuffer, m_zipImageSize);
 
 	char* outBuffer = m_Zip->decompress(inBuffer, m_zipImageSize, m_unzipImageSize);
-	short t{ 0 };
-	int i{ 0 };
+	delete[] inBuffer;
 
 	if (m_imgHeader->dimension == 2)
 	{
@@ -272,17 +274,18 @@ void NRRDReader::readImage()
 	}
 	
 	int numPixels{ 0 };
+	int i{ 0 };
+	short pixelValue{ 0 };
 
 	while (i < m_unzipImageSize)
 	{
-		numPixels = m_Image->setPixel((short)outBuffer[i] | (short)outBuffer[i + 1] << 8); // TODO: ALLOW OTHER TYPES
+		i = IO_Utils::littleEndianHexReader(outBuffer, pixelValue, i, NumBytes::SHORT); // TODO: ALLOW OTHER TYPES
+		numPixels = m_Image->setPixel(pixelValue);
 
 		if (numPixels > 0)
 		{
 			break;
 		}
-
-		i += 2;
 	}
 
 	if (numPixels != m_unzipImageSize / 2)
@@ -295,5 +298,5 @@ void NRRDReader::readImage()
 
 	delete[] outBuffer;
 
-	// TODO: transfer imgHeader ownership
+	m_Image->setHeader(m_imgHeader);
 }

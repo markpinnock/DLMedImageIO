@@ -1,19 +1,17 @@
-#ifndef NRRDREADER_H
-#define NRRDREADER_H
+#ifndef NIFTIREADER_H
+#define NIFTIREADER_H
 
 #include <fstream>
 
 #include "BaseReader.h"
-#include "../../Image/include/Image.h"
 
 
-/* NRRD Reader */
-class NRRDReader : public BaseReader
+class NIfTIReader : public BaseReader
 {
 public:
-	NRRDReader(const std::string& filePath) : BaseReader{ filePath } {}; // TODO: Can I replace these with template
-	NRRDReader(const fs::path& filePath) : BaseReader{ filePath } {};
-	NRRDReader(const char* filePath) : BaseReader{ filePath } {};
+	NIfTIReader(const std::string& filePath) : BaseReader{ filePath } {}; // TODO: Can I replace these with template
+	NIfTIReader(const fs::path& filePath) : BaseReader{ filePath } {};
+	NIfTIReader(const char* filePath) : BaseReader{ filePath } {};
 
 	void read() override;
 
@@ -32,4 +30,4 @@ private:
 	void readImage() override;
 };
 
-#endif // NRRDREADER_H
+#endif // !NIFTIREADER_H

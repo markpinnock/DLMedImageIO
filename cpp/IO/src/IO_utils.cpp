@@ -1,7 +1,9 @@
-#include "../include/utils.h"
+#include "../include/IO_utils.h"
 
 
-void utils::splitString(const std::string& delim,
+//------------------------------------------------------------------------
+
+void IO_Utils::splitString(const std::string& delim,
 						const std::string& input,
 						std::vector<std::string>& output)
 {
@@ -32,4 +34,20 @@ void utils::splitString(const std::string& delim,
 		substr = inputStr.substr(oldPos + 1, newPos - oldPos - 1);
 		output.push_back(substr);
 	} while (newPos != -1);
+}
+
+
+//------------------------------------------------------------------------
+
+unsigned long IO_Utils::littleEndianGZipFileSize(const char* buffer,
+									   const unsigned long zipImageSize)
+{
+	unsigned long unzipImageSize{ 0 };
+
+	for (int i{ 0 }; i < 4; ++i)
+	{
+		unzipImageSize |= (unsigned char)buffer[zipImageSize - 4 + i] << 8 * i;
+	}
+
+	return unzipImageSize;
 }

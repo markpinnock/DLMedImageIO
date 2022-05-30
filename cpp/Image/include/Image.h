@@ -33,13 +33,14 @@ public:
 	int setPixel(const int);
 	int getSize() { return m_imageMatrix.size(); }
 
-	/* Header getters */
+	/* Header getters and setters */
 	ImgHeaderMap getHeader() const { return m_imgHeader->imgHeaderMap; }
+	void setHeader(std::shared_ptr<ImageHeader> hdr) { m_imgHeader = hdr; }
 	void printHeader() const { m_imgHeader->printHeader(); }
 
 private:
 	std::vector<short> m_imageMatrix;
-	std::unique_ptr<ImageHeader> m_imgHeader;
+	std::shared_ptr<ImageHeader> m_imgHeader;
 	int m_count;
 	int m_dims;
 	int m_flatLength;

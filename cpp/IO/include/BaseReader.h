@@ -23,8 +23,8 @@ public:
 	virtual ~BaseReader() {};
 
 	/* Public image methods */
-	void read();
-	void getImage() {};
+	virtual void read() = 0;
+	std::unique_ptr<Image> getImage() { return std::move(m_Image); }
 
 	/* Header getter */
 	ImgHeaderMap getHeader() const { return m_imgHeader->imgHeaderMap; }
@@ -58,7 +58,7 @@ protected:
 	unsigned long m_unzipImageSize{ 0 };
 
 	std::unique_ptr<IZip> m_Zip;
-	std::unique_ptr<ImageHeader> m_imgHeader;
+	std::shared_ptr<ImageHeader> m_imgHeader;
 	std::unique_ptr<Image> m_Image;
 };
 

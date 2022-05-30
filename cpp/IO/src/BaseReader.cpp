@@ -1,3 +1,4 @@
+#include "../../Zip/include/GZip.h"
 #include "../include/BaseReader.h"
 
 
@@ -9,15 +10,4 @@ void BaseReader::checkFilePath() const
 	{
 		throw std::runtime_error("File not found: " + m_filePath.string());
 	}
-}
-
-
-//------------------------------------------------------------------------
-
-void BaseReader::read()
-{
-	checkFilePath();
-	readHeader();
-	parseHeader();
-	readImage();
 }
