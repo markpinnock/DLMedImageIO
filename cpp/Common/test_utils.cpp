@@ -30,22 +30,6 @@ std::string TestUtils::loadFile(const std::string& path)
 
 //------------------------------------------------------------------------
 
-bool TestUtils::compareCharArray(const char* a, const char* b, const size_t length)
-{
-	for (int i{ 0 }; i < length; ++i)
-	{
-		if (a[i] != b[i])
-		{
-			return false;
-		}
-	}
-
-	return true;
-}
-
-
-//------------------------------------------------------------------------
-
 unsigned long TestUtils::littleEndianGZipFileSize(const char* buffer,
 	const unsigned long zipImageSize)
 {

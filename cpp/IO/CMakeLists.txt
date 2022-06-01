@@ -16,7 +16,7 @@ if (BUILD_TESTING)
 	enable_testing ()
 
 	# Add executable for unit tests
-	add_executable (IO-tests "test/test_NRRD.cpp" "include/IO_utils.h" "src/IO_utils.cpp" "include/NIfTIReader.h")
+	add_executable (IO-tests "test/test_NRRD.cpp" "test/test_IO_utils.cpp" "include/IO_utils.h" "src/IO_utils.cpp" "include/NIfTIReader.h")
 
 	# Link library
 	if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")

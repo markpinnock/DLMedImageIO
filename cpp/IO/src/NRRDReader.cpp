@@ -279,7 +279,7 @@ void NRRDReader::readImage()
 
 	while (i < m_unzipImageSize)
 	{
-		i = IO_Utils::littleEndianHexReader(outBuffer, pixelValue, i, NumBytes::SHORT); // TODO: ALLOW OTHER TYPES
+		i = IO_Utils::readHexlittleEndian(outBuffer, pixelValue, i, NumBytes::SHORT); // TODO: ALLOW OTHER TYPES
 		numPixels = m_Image->setPixel(pixelValue);
 
 		if (numPixels > 0)

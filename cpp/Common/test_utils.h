@@ -5,7 +5,21 @@
 namespace TestUtils
 {
 	std::string loadFile(const std::string&);
-	bool compareCharArray(const char*, const char*, const size_t);
+
+	template<typename T>
+	bool compareArray(const T* a, const T* b, const size_t length)
+	{
+		for (int i{ 0 }; i < length; ++i)
+		{
+			if (a[i] != b[i])
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	unsigned long littleEndianGZipFileSize(const char*, const unsigned long);
 }
 

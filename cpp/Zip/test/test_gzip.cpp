@@ -31,7 +31,7 @@ TEST_F(TestGZip, TestSuccess)
 	unsigned long unzipLength = TestUtils::littleEndianGZipFileSize(gzip.c_str(), zipLength);
 
 	char* output = gzipClass.decompress(gzip.c_str(), zipLength, unzipLength);
-	EXPECT_TRUE(TestUtils::compareCharArray(unzipped.c_str(), output, unzipLength));
+	EXPECT_TRUE(TestUtils::compareArray(unzipped.c_str(), output, unzipLength));
 	delete[] output;
 }
 

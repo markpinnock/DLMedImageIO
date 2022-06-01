@@ -7,6 +7,8 @@
 
 #include <string>
 
+#include "Common/constants.h"
+#include "IO/include/IO_utils.h"
 #include "Common/test_utils.h"
 #include "Image/include/Image.h"
 #include "IO/include/NRRDReader.h"
@@ -35,6 +37,23 @@ int main()
 	img->printHeader();
 	reader.printHeader();
 	std::cout << (reader.getImage() == nullptr) << std::endl;
+
+	const size_t arraySize{ 3 };
+	char inBuffer[arraySize * NumBytes::SHORT] = { 0, 0, 127, 0, 255, 127 };
+	short correct[arraySize] = { 0, 127, 32767 };
+	short outBuffer[arraySize];
+	int i{ 0 };
+	int j{ 0 };
+	short value{ 0 };
+
+	while (i < arraySize * NumBytes::SHORT)
+	{
+		i = IO_Utils::readHexlittleEndian(inBuffer, value, i, NumBytes::SHORT);
+		outBuffer[j] = value;
+		j += 1;
+		std::cout << value << std::endl;
+	}
+
 	_CrtDumpMemoryLeaks();
 
 	return EXIT_SUCCESS;
