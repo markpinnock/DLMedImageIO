@@ -35,7 +35,7 @@ public:
 
 	/* Header getters and setters */
 	ImgHeaderMap getHeader() const { return m_imgHeader->imgHeaderMap; }
-	void setHeader(std::shared_ptr<ImageHeader> hdr) { m_imgHeader = hdr; }
+	void setHeader(std::shared_ptr<BaseHeader> hdr) { m_imgHeader = hdr; }
 	void printHeader() const { m_imgHeader->printHeader(); }
 
 private:

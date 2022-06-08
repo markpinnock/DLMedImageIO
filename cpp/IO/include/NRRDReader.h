@@ -18,6 +18,10 @@ public:
 
 	void read() override;
 
+	/* Header getter */
+	ImgHeaderMap getHeader() const { return m_imgHeader->imgHeaderMap; }
+	void printHeader() const { m_imgHeader->printHeader(); }
+
 private:
 	/* Path and file format checking methods */
 	void checkFileFormat(const char*) override;

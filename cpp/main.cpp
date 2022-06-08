@@ -20,8 +20,8 @@ namespace fs = std::filesystem;
 
 int main()
 {
-	NRRDReader reader1 = NRRDReader("C:\\ProjectImages\\Images\\T005A0\\T005A0AC005.nrrd");
-	NIfTIReader reader2 = NIfTIReader("C:\\ProjectImages\\BE.nii.gz");
+	NRRDReader reader1 = NRRDReader("D:\\ProjectImages\\Images\\T005A0\\T005A0AC005.nrrd");
+	NIfTIReader reader2 = NIfTIReader("D:\\ProjectImages\\LE.nii");
 
 	try
 	{

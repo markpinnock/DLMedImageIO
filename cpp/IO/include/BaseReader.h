@@ -26,10 +26,6 @@ public:
 	virtual void read() = 0;
 	std::unique_ptr<Image> getImage() { return std::move(m_Image); }
 
-	/* Header getter */
-	ImgHeaderMap getHeader() const { return m_imgHeader->imgHeaderMap; }
-	void printHeader() const { m_imgHeader->printHeader(); }
-
 	/* File path setter */
 	template<typename T>
 	void setFilePath(const T filePath) { m_filePath = filePath; }

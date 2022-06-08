@@ -24,21 +24,15 @@ namespace ArrayUtils
 	template<typename T>
 	T* getSubArray(const T* arr, const int start, const int offset)
 	{
-		T subArr[offset];
+		T* subArr = new T[offset];
 
-		for (int i{ 0 }; i < offset)
+		for (int i{ 0 }; i < offset; ++i)
 		{
 			subArr[i] = arr[start + i];
 		}
 
 		return subArr;
 	}
-
-
-	//------------------------------------------------------------------------
-
-	template<typename T>
-	char* getChunk(const)
 }
 
 #endif // !ARRAY_UTILS_H

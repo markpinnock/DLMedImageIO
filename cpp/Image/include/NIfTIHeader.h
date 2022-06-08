@@ -105,4 +105,54 @@ const struct NIfTIFieldSizes
 	short magic{ 4 };
 };
 
+
+//------------------------------------------------------------------------
+
+const struct NIfTINumElements
+{
+	short sizeof_hdr{ 1 };
+	short data_type{ 10 };
+	short db_name{ 18 };
+	short extents{ 1 };
+	short session_error{ 1 };
+	short regular{ 1 };
+	short dim_info{ 1 };
+	short dim{ 8 };
+	short intent_p1{ 1 };
+	short intent_p2{ 1 };
+	short intent_p3{ 1 };
+	short intent_code{ 1 };
+	short datatype{ 1 };
+	short bitpix{ 1 };
+	short slice_start{ 1 };
+	short pixdim{ 8 };
+	short vox_offset{ 1 };
+	short scl_slope{ 1 };
+	short scl_inter{ 1 };
+	short slice_end{ 1 };
+	short slice_code{ 1 };
+	short xyzt_units{ 1 };
+	short cal_max{ 1 };
+	short cal_min{ 1 };
+	short slice_duration{ 1 };
+	short toffset{ 1 };
+	short glmax{ 1 };
+	short glmin{ 1 };
+	short descrip{ 80 };
+	short aux_file{ 24 };
+	short qform_code{ 1 };
+	short sform_code{ 1 };
+	short quatern_b{ 1 };
+	short quatern_c{ 1 };
+	short quatern_d{ 1 };
+	short qoffset_x{ 1 };
+	short qoffset_y{ 1 };
+	short qoffset_z{ 1 };
+	short srow_x{ 4 };
+	short srow_y{ 4 };
+	short srow_z{ 4 };
+	short intent_name{ 16 };
+	short magic{ 4 };
+};
+
 #endif // !NIFTIHEADER_H
