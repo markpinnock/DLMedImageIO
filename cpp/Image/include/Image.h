@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include "ImageHeader.h"
+#include "BaseHeader.h"
 
 // https://stackoverflow.com/questions/243274/how-to-unit-test-abstract-classes-extend-with-stubs
 
@@ -40,7 +40,7 @@ public:
 
 private:
 	std::vector<short> m_imageMatrix;
-	std::shared_ptr<ImageHeader> m_imgHeader;
+	std::shared_ptr<BaseHeader> m_imgHeader;
 	int m_count;
 	int m_dims;
 	int m_flatLength;

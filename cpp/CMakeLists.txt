@@ -48,7 +48,7 @@ add_subdirectory ("Zip")
 # Include third party libraries
 add_subdirectory ("External")
 
-add_executable (io-main "main.cpp" "Common/types.h" "Common/constants.h" "Common/test_utils.h" "Common/test_utils.cpp")
+add_executable (io-main "main.cpp" "Common/types.h" "Common/constants.h" "Common/test_utils.h" "Common/test_utils.cpp" "Common/ArrayUtils.h" "Image/include/NIfTIHeader.h")
 target_link_libraries (io-main PUBLIC IO image zip)
 #target_link_libraries (io-main PUBLIC EXTERNAL_LIBS)
 target_include_directories (io-main PUBLIC ${PROJECT_BINARY_DIR} ${EXTRA_INCLUDES})

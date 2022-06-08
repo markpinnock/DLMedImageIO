@@ -12,6 +12,7 @@
 #include "Common/test_utils.h"
 #include "Image/include/Image.h"
 #include "IO/include/NRRDReader.h"
+#include "IO/include/NIfTIReader.h"
 #include "Zip/include/GZip.h"
 
 namespace fs = std::filesystem;
@@ -19,12 +20,12 @@ namespace fs = std::filesystem;
 
 int main()
 {
-	//NRRDReader reader = NRRDReader(".\\test.nrrd");
-	NRRDReader reader = NRRDReader("D:\\ProjectImages\\Images\\T005A0\\T005A0AC005.nrrd");
+	NRRDReader reader1 = NRRDReader("C:\\ProjectImages\\Images\\T005A0\\T005A0AC005.nrrd");
+	NIfTIReader reader2 = NIfTIReader("C:\\ProjectImages\\BE.nii.gz");
 
 	try
 	{
-		reader.read();
+		reader1.read();
 	}
 	catch (std::exception& e)
 	{
@@ -32,26 +33,17 @@ int main()
 		return EXIT_FAILURE;
 	}
 
-	auto img = reader.getImage();
-	std::cout << (img == nullptr) << std::endl;
+	auto img = reader1.getImage();
 	img->printHeader();
-	reader.printHeader();
-	std::cout << (reader.getImage() == nullptr) << std::endl;
 
-	const size_t arraySize{ 3 };
-	char inBuffer[arraySize * NumBytes::SHORT] = { 0, 0, 127, 0, 255, 127 };
-	short correct[arraySize] = { 0, 127, 32767 };
-	short outBuffer[arraySize];
-	int i{ 0 };
-	int j{ 0 };
-	short value{ 0 };
-
-	while (i < arraySize * NumBytes::SHORT)
+	try
 	{
-		i = IO_Utils::readHexlittleEndian(inBuffer, value, i, NumBytes::SHORT);
-		outBuffer[j] = value;
-		j += 1;
-		std::cout << value << std::endl;
+		reader2.read(); // 902629
+	}
+	catch (std::exception& e)
+	{
+		std::cout << e.what() << std::endl;
+		return EXIT_FAILURE;
 	}
 
 	_CrtDumpMemoryLeaks();

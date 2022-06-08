@@ -1,10 +1,11 @@
 #include <iostream>
 
+#include "../../Common/ArrayUtils.h"
 #include "../../Common/constants.h"
-#include "../../Image/include/ImageHeader.h"
+#include "../../Image/include/NRRDHeader.h"
 #include "../../Zip/include/GZip.h"
-#include "../include/NRRDReader.h"
 #include "../include/IO_utils.h"
+#include "../include/NRRDReader.h"
 
 namespace RC = ReaderConst;
 
@@ -13,7 +14,14 @@ namespace RC = ReaderConst;
 
 void NRRDReader::read()
 {
-	checkFilePath();
+	readFile();
+
+	// Check that file format is NRRD
+	char prefixBuffer[RC::MAX_BUFFER_SIZE];
+	m_file.getline(prefixBuffer, RC::MAX_BUFFER_SIZE);
+	m_file.seekg(0, m_file.beg);
+	checkFileFormat(prefixBuffer);
+
 	readHeader();
 	parseHeader();
 	readImage();
@@ -25,11 +33,9 @@ void NRRDReader::read()
 	it is valid
 	- throws runtime error if not */
 
-void NRRDReader::checkFileFormat(const std::string& prefix,
-								 const int start,
-								 const int length) const
+void NRRDReader::checkFileFormat(const char* prefix)
 {
-	if (strcmp(prefix.substr(start, length).c_str(), RC::NRRD_PREFIX))
+	if (!ArrayUtils::compareArray(prefix, RC::NRRD_PREFIX, RC::NRRD_PREFIX_SIZE))
 	{
 		throw std::runtime_error("Incorrect file format: "
 			+ m_filePath.string()
@@ -106,34 +112,22 @@ int NRRDReader::readLine(const std::string& inBuffer,
 
 void NRRDReader::readHeader()
 {
-	m_imgHeader = std::make_shared<ImageHeader>();
+	m_imgHeader = std::make_shared<NRRDHeader>();
 
-	char prefixBuffer[RC::MAX_BUFFER_SIZE];
 	std::string buffer;
-	std::ifstream file(m_filePath, std::ios::in | std::ios::binary);
-
-	if (file.fail())
-	{
-		throw std::runtime_error("Unable to open fstream: "
-			+ m_filePath.string());
-	}
-
-	// Check that file format is NRRD
-	file.getline(prefixBuffer, RC::MAX_BUFFER_SIZE);
-	checkFileFormat(prefixBuffer, 0, 4);
-
 	std::string k;
 	std::string v;
 
-	while (!file.eof())
+	while (!m_file.eof())
 	{
-		std::getline(file, buffer, '\n');
+		std::getline(m_file, buffer, '\n');
 
 		if (!buffer.size())
 		{
-			m_headerSize = file.tellg();
-			file.seekg(0, file.end);
-			m_zipImageSize = static_cast<int>(file.tellg()) - m_headerSize;
+			m_headerSize = m_file.tellg();
+			m_file.seekg(0, m_file.end);
+			unsigned long fileSize = checkFileLength();
+			m_zipImageSize = fileSize - m_headerSize;
 
 			if (m_headerSize == 0 || m_zipImageSize == 0)
 			{
@@ -246,9 +240,8 @@ void NRRDReader::readImage()
 	}
 
 	char* inBuffer = new char[m_zipImageSize]; // TODO CHECK HEADER, ALLOW OTHER ALGS
-	std::ifstream file(m_filePath, std::ios::in | std::ios::binary);
-	file.seekg(m_headerSize, std::ios::beg);
-	file.read(inBuffer, m_zipImageSize);
+	m_file.seekg(m_headerSize, std::ios::beg);
+	m_file.read(inBuffer, m_zipImageSize);
 
 	m_unzipImageSize = IO_Utils::littleEndianGZipFileSize(inBuffer, m_zipImageSize);
 
@@ -279,7 +272,7 @@ void NRRDReader::readImage()
 
 	while (i < m_unzipImageSize)
 	{
-		i = IO_Utils::readHexlittleEndian(outBuffer, pixelValue, i, NumBytes::SHORT); // TODO: ALLOW OTHER TYPES
+		i = IO_Utils::readHex(outBuffer, pixelValue, i, NumBytes::SHORT, true); // TODO: ALLOW OTHER TYPES
 		numPixels = m_Image->setPixel(pixelValue);
 
 		if (numPixels > 0)

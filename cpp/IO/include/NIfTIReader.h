@@ -4,6 +4,8 @@
 #include <fstream>
 
 #include "BaseReader.h"
+#include "../../Image/include/Image.h"
+#include "../../Image/include/NIfTIHeader.h"
 
 
 class NIfTIReader : public BaseReader
@@ -17,9 +19,7 @@ public:
 
 private:
 	/* Path and file format checking methods */
-	void checkFileFormat(const std::string&,
-						 const int,
-						 const int) const override;
+	void checkFileFormat(const char*) override;
 
 	/* Header reading helper methods */
 	int readLine(const std::string&, std::string&, std::string&);
@@ -28,6 +28,9 @@ private:
 	void readHeader() override;
 	void parseHeader() override;
 	void readImage() override;
+
+	char* m_fileBuffer;
+	std::shared_ptr<NIfTIHeader> m_imgHeader;
 };
 
 #endif // !NIFTIREADER_H

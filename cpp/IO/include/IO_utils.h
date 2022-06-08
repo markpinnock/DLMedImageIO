@@ -14,14 +14,22 @@ namespace IO_Utils
 	unsigned long littleEndianGZipFileSize(const char*, const unsigned long);
 
 	template<typename T>
-	int readHexlittleEndian(const char* buffer, T& value, int i, int numBytes)
+	int readHex(const char* buffer, T& value, int i, int numBytes, bool littleEndian)
 	{
 		value = 0;
 		int j{ 0 };
 
 		while (j < numBytes)
 		{
-			value |= (unsigned char)buffer[i + j] << (8 * j);
+			if (littleEndian)
+			{
+				value |= (unsigned char)buffer[i + j] << (8 * j);
+			}
+			else
+			{
+				value |= (unsigned char)buffer[i + j] << (8 * (numBytes - j - 1));
+			}
+	
 			++j;
 		}
 

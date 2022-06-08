@@ -2,12 +2,12 @@
 #define BASEREADER_H
 
 #include <filesystem>
+#include <fstream>
 #include <map>
 #include <string>
 
 #include "../../Common/types.h"
 #include "../../Image/include/Image.h"
-#include "../../Image/include/ImageHeader.h"
 #include "../../Zip/include/IZip.h"
 
 namespace fs = std::filesystem;
@@ -35,16 +35,17 @@ public:
 	void setFilePath(const T filePath) { m_filePath = filePath; }
 
 protected:
-	/* Internal use: checks file path to ensure it is valid:
-		- throws runtime error if not */
-	void checkFilePath() const;
+	/* Internal use: loads file
+		- throws runtime error if fail */
+	void readFile();
+
+	/* Internal use: returns length of loaded file */
+	unsigned long checkFileLength();
 
 	/* Internal use: checks file format from image header to ensure
-		it is valid
-		- throws runtime error if not */
-	virtual void checkFileFormat(const std::string&,
-								 const int,
-								 const int) const = 0;
+	   it is valid
+	   - throws runtime error if not */
+	virtual void checkFileFormat(const char*) = 0;
 
 	/* Header and image reading methods */
 	virtual void readHeader() = 0;
@@ -53,12 +54,12 @@ protected:
 
 	/* Attributes */
 	fs::path m_filePath;
+	std::ifstream m_file;
 	unsigned long m_headerSize{ 0 };
 	unsigned long m_zipImageSize{ 0 };
 	unsigned long m_unzipImageSize{ 0 };
 
 	std::unique_ptr<IZip> m_Zip;
-	std::shared_ptr<ImageHeader> m_imgHeader;
 	std::unique_ptr<Image> m_Image;
 };
 

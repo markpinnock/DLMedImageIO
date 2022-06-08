@@ -1,7 +1,7 @@
 # IO module CMake file
 
 # Add source code to IO library and link with zlib
-add_library (IO STATIC "src/BaseReader.cpp" "src/NRRDReader.cpp" "include/IO_utils.h" "src/IO_utils.cpp" "include/NIfTIReader.h")
+add_library (IO STATIC "src/BaseReader.cpp" "src/NRRDReader.cpp" "src/NIfTIReader.cpp" "include/IO_utils.h" "src/IO_utils.cpp" "include/NIfTIReader.h")
 
 # Add libraries
 #find_library (TF NAMES tensorflow_cc PATHS "${TF_LIB_DIR}/src")

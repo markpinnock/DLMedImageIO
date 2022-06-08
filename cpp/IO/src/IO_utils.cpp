@@ -3,9 +3,10 @@
 
 //------------------------------------------------------------------------
 
-void IO_Utils::splitString(const std::string& delim,
-						const std::string& input,
-						std::vector<std::string>& output)
+void IO_Utils::splitString(
+	const std::string& delim,
+	const std::string& input,
+	std::vector<std::string>& output)
 {
 	size_t startPos;
 	size_t endPos;
@@ -39,8 +40,9 @@ void IO_Utils::splitString(const std::string& delim,
 
 //------------------------------------------------------------------------
 
-unsigned long IO_Utils::littleEndianGZipFileSize(const char* buffer,
-									   const unsigned long zipImageSize)
+unsigned long IO_Utils::littleEndianGZipFileSize(
+	const char* buffer,
+	const unsigned long zipImageSize)
 {
 	unsigned long unzipImageSize{ 0 };
 

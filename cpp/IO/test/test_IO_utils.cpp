@@ -19,7 +19,7 @@ TEST(hexReaderLE, CHAR)
 
 	while (i < arraySize)
 	{
-		i = IO_Utils::readHexlittleEndian(inBuffer, value, i, NumBytes::CHAR);
+		i = IO_Utils::readHex(inBuffer, value, i, NumBytes::CHAR, true);
 		outBuffer[j] = value;
 		j += 1;
 	}
@@ -42,7 +42,7 @@ TEST(hexReaderLE, SHORT)
 
 	while (i < arraySize * NumBytes::SHORT)
 	{
-		i = IO_Utils::readHexlittleEndian(inBuffer, value, i, NumBytes::SHORT);
+		i = IO_Utils::readHex(inBuffer, value, i, NumBytes::SHORT, true);
 		outBuffer[j] = value;
 		j += 1;
 	}
@@ -65,7 +65,7 @@ TEST(hexReaderLE, INT)
 
 	while (i < arraySize * NumBytes::INT)
 	{
-		i = IO_Utils::readHexlittleEndian(inBuffer, value, i, NumBytes::INT);
+		i = IO_Utils::readHex(inBuffer, value, i, NumBytes::INT, true);
 		outBuffer[j] = value;
 		j += 1;
 	}
@@ -89,7 +89,7 @@ TEST(hexReaderLE, LONG)
 
 	while (i < arraySize * NumBytes::LONG)
 	{
-		i = IO_Utils::readHexlittleEndian(inBuffer, value, i, NumBytes::LONG);
+		i = IO_Utils::readHex(inBuffer, value, i, NumBytes::LONG, true);
 		outBuffer[j] = value;
 		j += 1;
 	}

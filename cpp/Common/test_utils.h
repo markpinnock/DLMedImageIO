@@ -6,7 +6,7 @@ namespace TestUtils
 {
 	std::string loadFile(const std::string&);
 
-	template<typename T>
+	template<typename T> // TODO: CONSIDER REMOVING (ArrayUtils.h)
 	bool compareArray(const T* a, const T* b, const size_t length)
 	{
 		for (int i{ 0 }; i < length; ++i)
