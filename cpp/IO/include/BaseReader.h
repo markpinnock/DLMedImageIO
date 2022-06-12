@@ -36,7 +36,7 @@ protected:
 	void readFile();
 
 	/* Internal use: returns length of loaded file */
-	unsigned long checkFileLength();
+	size_t checkFileLength();
 
 	/* Internal use: checks file format from image header to ensure
 	   it is valid
@@ -51,12 +51,18 @@ protected:
 	/* Attributes */
 	fs::path m_filePath;
 	std::ifstream m_file;
-	unsigned long m_headerSize{ 0 };
-	unsigned long m_zipImageSize{ 0 };
-	unsigned long m_unzipImageSize{ 0 };
+
+	size_t m_headerSize{ 0 };
+	size_t m_zipImageSize{ 0 };
+	size_t m_unzipImageSize{ 0 };
+	std::string m_imgDataType;
+	int m_imgDataSize;
+	bool m_littleEndian;
 
 	std::unique_ptr<IZip> m_Zip;
 	std::unique_ptr<Image> m_Image;
+
+	char* m_fileBuffer;
 };
 
 #endif // !BASEREADER_H

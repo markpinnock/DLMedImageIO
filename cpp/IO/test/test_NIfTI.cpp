@@ -2,13 +2,13 @@
 
 #include "../../Common/constants.h"
 #include "../../Common/test_utils.h"
-#include "../../IO/include/NRRDReader.h"
+#include "../../IO/include/NIfTIReader.h"
 #include "../include/IO_utils.h"
 
 
 //------------------------------------------------------------------------
 
-class TestNRRD : public ::testing::Test
+class TestNIfTI : public ::testing::Test
 {
 protected:
 	void SetUp() override
@@ -45,9 +45,9 @@ protected:
 
 //------------------------------------------------------------------------
 
-TEST_F(TestNRRD, gz2D)
+TEST_F(TestNIfTI, gz2D)
 {
-	auto rdr = NRRDReader(prefix + "NRRD\\2D_short_gz.nrrd");
+	auto rdr = NIfTIReader(prefix + "NIfTI\\2D_short.nii.gz");
 	rdr.read();
 	auto img = rdr.getImage();
 
@@ -57,9 +57,9 @@ TEST_F(TestNRRD, gz2D)
 
 //------------------------------------------------------------------------
 
-TEST_F(TestNRRD, gz3D)
+TEST_F(TestNIfTI, gz3D)
 {
-	auto rdr = NRRDReader(prefix + "NRRD\\3D_short_gz.nrrd");
+	auto rdr = NIfTIReader(prefix + "NIfTI\\3D_short.nii.gz");
 	rdr.read();
 	auto img = rdr.getImage();
 
@@ -69,9 +69,9 @@ TEST_F(TestNRRD, gz3D)
 
 //------------------------------------------------------------------------
 
-TEST_F(TestNRRD, raw2D)
+TEST_F(TestNIfTI, raw2D)
 {
-	auto rdr = NRRDReader(prefix + "NRRD\\2D_short_raw.nrrd");
+	auto rdr = NIfTIReader(prefix + "NIfTI\\2D_short.nii");
 	rdr.read();
 	auto img = rdr.getImage();
 
@@ -81,9 +81,9 @@ TEST_F(TestNRRD, raw2D)
 
 //------------------------------------------------------------------------
 
-TEST_F(TestNRRD, raw3D)
+TEST_F(TestNIfTI, raw3D)
 {
-	auto rdr = NRRDReader(prefix + "NRRD\\3D_short_raw.nrrd");
+	auto rdr = NIfTIReader(prefix + "NIfTI\\3D_short.nii");
 	rdr.read();
 	auto img = rdr.getImage();
 
@@ -93,9 +93,9 @@ TEST_F(TestNRRD, raw3D)
 
 //------------------------------------------------------------------------
 
-TEST_F(TestNRRD, char8)
+TEST_F(TestNIfTI, char8)
 {
-	auto rdr = NRRDReader(prefix + "NRRD\\2D_char_gz.nrrd");
+	auto rdr = NIfTIReader(prefix + "NIfTI\\2D_char.nii.gz");
 	rdr.read();
 	auto img = rdr.getImage();
 
@@ -105,9 +105,9 @@ TEST_F(TestNRRD, char8)
 
 //------------------------------------------------------------------------
 
-TEST_F(TestNRRD, int32)
+TEST_F(TestNIfTI, int32)
 {
-	auto rdr = NRRDReader(prefix + "NRRD\\2D_int_gz.nrrd");
+	auto rdr = NIfTIReader(prefix + "NIfTI\\2D_int.nii.gz");
 	rdr.read();
 	auto img = rdr.getImage();
 
@@ -117,10 +117,11 @@ TEST_F(TestNRRD, int32)
 
 //------------------------------------------------------------------------
 
-TEST_F(TestNRRD, long64)
+TEST_F(TestNIfTI, long64)
 {
-	auto rdr = NRRDReader(prefix + "NRRD\\2D_long_gz.nrrd");
+	auto rdr = NIfTIReader(prefix + "NIfTI\\2D_long.nii.gz");
 	rdr.read();
 	auto img = rdr.getImage();
+
 	EXPECT_EQ(test2Dvec, img->getImage());
 }

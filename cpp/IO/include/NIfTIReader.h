@@ -30,7 +30,6 @@ private:
 	void parseHeader() override;
 	void readImage() override;
 
-	char* m_fileBuffer;
 	std::shared_ptr<NIfTIHeader> m_imgHeader;
 };
 

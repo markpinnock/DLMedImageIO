@@ -3,7 +3,7 @@
 
 //------------------------------------------------------------------------
 
-int Image::setPixel(const int value)
+int Image::setPixel(const float value)
 {
 	m_imageMatrix[m_count] = value;
 	m_count += 1;

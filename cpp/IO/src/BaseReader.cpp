@@ -18,11 +18,11 @@ void BaseReader::readFile()
 
 //------------------------------------------------------------------------
 
-unsigned long BaseReader::checkFileLength()
+size_t BaseReader::checkFileLength()
 {
-	unsigned long fileSize{ 0 };
+	size_t fileSize{ 0 };
 	m_file.seekg(0, m_file.end);
-	fileSize = static_cast<unsigned long>(m_file.tellg());
+	fileSize = static_cast<size_t>(m_file.tellg());
 	m_file.seekg(0, m_file.beg);
 
 	return fileSize;

@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <iostream>
 
 #include "../../Common/ArrayUtils.h"
@@ -162,12 +163,75 @@ void NRRDReader::readHeader()
 
 void NRRDReader::parseHeader()
 {
+	const std::vector<std::string> charDataTypes{ "signed char", "int8", "int8_t" };
+	const std::vector<std::string> ucharDataTypes{ "uchar", "unsigned char", "uint8", "uint8_t" };
+	const std::vector<std::string> shortDataTypes{ "short", "short int", "signed short", "signed short int", "int16", "int16_t" };
+	const std::vector<std::string> ushortDataTypes{ "ushort", "unsigned short", "unsigned short int", "uint16", "uint16_t" };
+	const std::vector<std::string> intDataTypes{ "int", "signed int", "int32", "int32_t" };
+	const std::vector<std::string> uintDataTypes{ "uint", "unsigned int", "uint32", "uint32_t" };
+	const std::vector<std::string> longDataTypes{ "longlong", "long long", "long long int", "signed long long", "signed long long int", "int64", "int64_t" };
+	const std::vector<std::string> ulongDataTypes{ "ulonglong", "unsigned long long", "unsigned long long int", "uint64", "uint64_t" };
 
 	for (auto const& [key, val] : m_imgHeader->imgHeaderMap)
 	{
 		if (key == "type")
 		{
 			m_imgHeader->type = val;
+
+			if (std::find(charDataTypes.begin(), charDataTypes.end(), val) != charDataTypes.end())
+			{
+				m_imgDataType = "char";
+				m_imgDataSize = NumBytes::CHAR;
+			}
+			else if (std::find(ucharDataTypes.begin(), ucharDataTypes.end(), val) != ucharDataTypes.end())
+			{
+				m_imgDataType = "uchar";
+				m_imgDataSize = NumBytes::CHAR;
+			}
+			else if (std::find(shortDataTypes.begin(), shortDataTypes.end(), val) != shortDataTypes.end())
+			{
+				m_imgDataType = "short";
+				m_imgDataSize = NumBytes::SHORT;
+			}
+			else if (std::find(ushortDataTypes.begin(), ushortDataTypes.end(), val) != ushortDataTypes.end())
+			{
+				m_imgDataType = "ushort";
+				m_imgDataSize = NumBytes::SHORT;
+			}
+			else if (std::find(intDataTypes.begin(), intDataTypes.end(), val) != intDataTypes.end())
+			{
+				m_imgDataType = "int";
+				m_imgDataSize = NumBytes::INT;
+			}
+			else if (std::find(uintDataTypes.begin(), uintDataTypes.end(), val) != uintDataTypes.end())
+			{
+				m_imgDataType = "uint";
+				m_imgDataSize = NumBytes::INT;
+			}
+			else if (std::find(longDataTypes.begin(), longDataTypes.end(), val) != longDataTypes.end())
+			{
+				m_imgDataType = "long";
+				m_imgDataSize = NumBytes::LONG;
+			}
+			else if (std::find(ulongDataTypes.begin(), ulongDataTypes.end(), val) != ulongDataTypes.end())
+			{
+				m_imgDataType = "ulong";
+				m_imgDataSize = NumBytes::LONG;
+			}
+			else if (val == "float")
+			{
+				m_imgDataType = "float";
+				m_imgDataSize = NumBytes::INT;
+			}
+			else if (val == "double")
+			{
+				m_imgDataType = "double";
+				m_imgDataSize = NumBytes::LONG;
+			}
+			else
+			{
+				throw std::runtime_error("Data type not recognised: " + val);
+			}
 		}
 		else if (key == "sizes")
 		{
@@ -211,6 +275,7 @@ void NRRDReader::parseHeader()
 		else if (key == "endian")
 		{
 			m_imgHeader->endian = val;
+			m_littleEndian = (val == "little") ? true : false;
 		}
 		else if (key == "encoding")
 		{
@@ -237,16 +302,26 @@ void NRRDReader::readImage()
 	if (m_imgHeader->encoding == "gzip")
 	{
 		m_Zip = std::make_unique<GZip>();
+		char* inBuffer = new char[m_zipImageSize]; // TODO CHECK HEADER, ALLOW OTHER ALGS
+		m_file.seekg(m_headerSize, std::ios::beg);
+		m_file.read(inBuffer, m_zipImageSize);
+
+		m_unzipImageSize = IO_Utils::littleEndianGZipFileSize(inBuffer, m_zipImageSize);
+		m_fileBuffer = m_Zip->decompress(inBuffer, m_zipImageSize, m_unzipImageSize);
+		delete[] inBuffer;
 	}
-
-	char* inBuffer = new char[m_zipImageSize]; // TODO CHECK HEADER, ALLOW OTHER ALGS
-	m_file.seekg(m_headerSize, std::ios::beg);
-	m_file.read(inBuffer, m_zipImageSize);
-
-	m_unzipImageSize = IO_Utils::littleEndianGZipFileSize(inBuffer, m_zipImageSize);
-
-	char* outBuffer = m_Zip->decompress(inBuffer, m_zipImageSize, m_unzipImageSize);
-	delete[] inBuffer;
+	else if (m_imgHeader->encoding == "raw")
+	{
+		unsigned long fileSize = checkFileLength();
+		m_unzipImageSize = fileSize - m_headerSize;
+		m_fileBuffer = new char[m_unzipImageSize];
+		m_file.seekg(m_headerSize, std::ios::beg);
+		m_file.read(m_fileBuffer, m_zipImageSize);
+	}
+	else
+	{
+		throw std::runtime_error("Invalid compression format: " + m_imgHeader->encoding);
+	}
 
 	if (m_imgHeader->dimension == 2)
 	{
@@ -268,11 +343,11 @@ void NRRDReader::readImage()
 	
 	int numPixels{ 0 };
 	int i{ 0 };
-	short pixelValue{ 0 };
+	int pixelValue{ 0 };
 
 	while (i < m_unzipImageSize)
 	{
-		i = IO_Utils::readHex(outBuffer, pixelValue, i, NumBytes::SHORT, true); // TODO: ALLOW OTHER TYPES
+		i = IO_Utils::readHex(m_fileBuffer, pixelValue, i, m_imgDataSize, m_littleEndian);
 		numPixels = m_Image->setPixel(pixelValue);
 
 		if (numPixels > 0)
@@ -281,15 +356,15 @@ void NRRDReader::readImage()
 		}
 	}
 
-	if (numPixels != m_unzipImageSize / 2)
+	if (numPixels != m_unzipImageSize / m_imgDataSize)
 	{
 		throw std::runtime_error("Incomplete image reading: "
 			+ std::to_string(numPixels)
 			+ " vs "
-			+ std::to_string(m_unzipImageSize / 2));
+			+ std::to_string(m_unzipImageSize / m_imgDataSize));
 	}
 
-	delete[] outBuffer;
+	delete[] m_fileBuffer;
 
 	m_Image->setHeader(m_imgHeader);
 }
