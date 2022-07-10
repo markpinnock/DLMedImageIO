@@ -328,14 +328,12 @@ void NRRDReader::readImage()
 		m_Image = std::make_unique<Image>(m_imgHeader->sizes[0],
 										  m_imgHeader->sizes[1]);
 	}
-
 	else if (m_imgHeader->dimension == 3)
 	{
 		m_Image = std::make_unique<Image>(m_imgHeader->sizes[0],
 										  m_imgHeader->sizes[1],
 										  m_imgHeader->sizes[2]);
 	}
-
 	else
 	{
 		throw std::runtime_error("Invalid dimensions: " + m_imgHeader->dimension);
@@ -343,7 +341,7 @@ void NRRDReader::readImage()
 	
 	int numPixels{ 0 };
 	int i{ 0 };
-	int pixelValue{ 0 };
+	short pixelValue{ 0 };
 
 	while (i < m_unzipImageSize)
 	{

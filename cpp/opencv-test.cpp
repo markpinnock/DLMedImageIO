@@ -1,12 +1,18 @@
+//#define _CRTDBG_MAP_ALLOC
+//#include <stdlib.h>
+//#include <crtdbg.h>
+
 #include <iostream>
 #include <opencv2/opencv.hpp>
 
 #include "IO/include/NRRDReader.h"
+#include "IO/include/NIfTIReader.h"
 
 
 int main()
 {
-	NRRDReader reader = NRRDReader("..\\..\\..\\IO\\test\\fixtures\\NRRD\\2D_short_gz.nrrd");
+	//NRRDReader reader = NRRDReader("D:\\ProjectImages\\Images\\T005A0\\T005A0AC005.nrrd");
+	auto reader = NIfTIReader("D:\\ProjectImages\\LE.nii.gz");
 
 	try
 	{
@@ -20,22 +26,27 @@ int main()
 
 	auto img = reader.getImage();
 	auto vec = img->getImage();
+	img->printImageMatrix();
 
-	for (int j{ 0 }; j < 8; ++j)
+	std::vector<float> slice;
+
+	for (int j{ 0 }; j < img->getImgDims()[1]; ++j)
 	{
-		for (int i{ 0 }; i < 8; ++i)
+		for (int i{ 0 }; i < img->getImgDims()[0]; ++i)
 		{
-			std::cout << vec[i + j * 8] << " ";
+			//slice.push_back((vec[i + (j * img->getImgDims()[1])] + 2048) / 4096);
+			slice.push_back(vec[i + (j * img->getImgDims()[1])] / 255);
 		}
-
-		std::cout << std::endl;
 	}
 
 	cv::Mat image;
-	image = cv::Mat(8, 8, 5, vec.data());
+	//image = cv::Mat(512, 512, 5, slice.data());
+	image = cv::Mat(91, 109, 5, slice.data());
 	cv::imshow("1", image);
 	cv::waitKey(10000);
 	cv::destroyWindow("1");
 
-	return 0;
+	_CrtDumpMemoryLeaks();
+
+	return EXIT_SUCCESS;
 }
